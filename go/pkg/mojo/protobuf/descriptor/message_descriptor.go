@@ -160,6 +160,20 @@ func GetFloat64FieldOption(field *descriptor.FieldDescriptorProto, extension *pr
 	return nil
 }
 
+func SetBoolFieldOption(extension *proto.ExtensionDesc, value bool) func(field *descriptor.FieldDescriptorProto) {
+	return func(field *descriptor.FieldDescriptorProto) {
+		if HasFieldExtension(field, extension) {
+			return
+		}
+		if field.Options == nil {
+			field.Options = &descriptor.FieldOptions{}
+		}
+		if err := proto.SetExtension(field.Options, extension, &value); err != nil {
+			panic(err)
+		}
+	}
+}
+
 func GetBoolFieldOption(field *descriptor.FieldDescriptorProto, extension *proto.ExtensionDesc) *bool {
 	if v, ok := getFieldOption(field, extension).(*bool); ok {
 		return v
