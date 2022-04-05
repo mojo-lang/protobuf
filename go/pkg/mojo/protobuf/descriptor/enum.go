@@ -1,6 +1,9 @@
 package descriptor
 
-import "google.golang.org/protobuf/types/descriptorpb"
+import (
+    "google.golang.org/protobuf/types/descriptorpb"
+    "strings"
+)
 
 // Enum describes an enum. If it's at top level, its Parent will be nil.
 // Otherwise, it will be the descriptor of the message in which it is defined.
@@ -14,31 +17,6 @@ type Enum struct {
     Values []*EnumValue // enum value declarations
 }
 
-//func NewEnumDescriptor(file *FileDescriptor) *Enum {
-//    return &Enum{
-//        Descriptor: Descriptor{
-//            File: file,
-//        },
-//        EnumDescriptorProto: &descriptorpb.EnumDescriptorProto{},
-//    }
-//}
-//
-//// Return a slice of all the EnumDescriptors defined within this File
-//func WrapEnumDescriptors(file *FileDescriptor, descs []*Message) []*Enum {
-//    sl := make([]*Enum, 0, len(file.EnumType)+10)
-//    // Top-level Enums.
-//    for i, enum := range file.EnumType {
-//        sl = append(sl, NewEnum(enum, nil, file, i))
-//    }
-//    // Enums within Messages. Enums within embedded Messages appear in the outer-most message.
-//    for _, nested := range descs {
-//        for i, enum := range nested.EnumType {
-//            sl = append(sl, NewEnum(enum, nested, file, i))
-//        }
-//    }
-//    return sl
-//}
-
 // NewEnum Construct the Enum
 func NewEnum(file *File) *Enum {
     enum := &Enum{
@@ -48,10 +26,6 @@ func NewEnum(file *File) *Enum {
         Proto: &descriptorpb.EnumDescriptorProto{},
     }
 
-    //file.Package.EnumsByName[desc.FullName()] = enum
-    //for i, vds := 0, enum.Desc.Values(); i < vds.Len(); i++ {
-    //    enum.Values = append(enum.Values, newEnumValue(file, parent, enum, vds.Get(i)))
-    //}
     return enum
 }
 
@@ -62,6 +36,11 @@ func NewEnumFrom(file *File, proto *descriptorpb.EnumDescriptorProto) *Enum {
         },
         Proto: proto,
     }
+
+    for _, value := range proto.Value {
+        enum.AppendValue(NewEnumValueFrom(enum, value))
+    }
+
     return enum
 }
 
@@ -97,7 +76,17 @@ func (m *Enum) GetName() string {
 
 func (m *Enum) GetFullName() string {
     if m != nil {
+        if len(m.FullName) == 0 {
+            m.FullName = strings.Join([]string{m.GetPackageName(), m.GetName()}, ".")
+        }
         return m.FullName
+    }
+    return ""
+}
+
+func (m *Enum) GetPackageName() string {
+    if m != nil && m.File != nil {
+        return m.File.GetPackageName()
     }
     return ""
 }
@@ -108,4 +97,21 @@ func (m *Enum) SetName(name string) *Enum {
         m.FullName = concatFullName(m.File.GetPackageName(), name)
     }
     return m
+}
+
+func (m *Enum) HasValue() bool {
+    return m != nil && len(m.Values) > 0
+}
+
+func (m *Enum) GetValue(name string) *EnumValue {
+    for _, v := range m.Values {
+        if v.GetName() == name {
+            return v
+        }
+    }
+    return nil
+}
+
+func (m *Enum) IsValueExist(name string) bool {
+    return m.GetValue(name) != nil
 }

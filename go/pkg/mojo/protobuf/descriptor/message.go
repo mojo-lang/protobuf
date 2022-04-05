@@ -50,7 +50,7 @@ func NewMessageFrom(file *File, proto *descriptorpb.DescriptorProto) *Message {
         message.AppendInnerEnum(NewEnumFrom(file, enum))
     }
     for _, msg := range proto.NestedType {
-        message.AppendInnerMessage(NewMessageFrom(file, msg))
+        message.AppendMessage(NewMessageFrom(file, msg))
     }
     for _, field := range proto.Field {
         message.AppendField(NewFieldFrom(message, field))
@@ -76,25 +76,72 @@ func (m *Message) proto() *descriptorpb.DescriptorProto {
     return nil
 }
 
-func (m *Message) IsInnerMessageExist(name string) bool {
-    if m != nil {
-        for _, msg := range m.Messages {
-            if msg.GetName() == name {
-                return true
-            }
-        }
-    }
-
-    return false
+func (m *Message) HasMessage() bool {
+    return m != nil && len(m.Messages) > 0
 }
 
-func (m *Message) GetInnerMessage(name string) *Message {
+func (m *Message) GetMessage(name string) *Message {
     for _, msg := range m.Messages {
         if msg.GetName() == name {
             return msg
         }
     }
     return nil
+}
+
+func (m *Message) IsMessageExist(name string) bool {
+    return m.GetMessage(name) != nil
+}
+
+func (m *Message) HasEnum() bool {
+    return m != nil && len(m.Enums) > 0
+}
+
+func (m *Message) GetEnum(name string) *Enum {
+    for _, e := range m.Enums {
+        if e.GetName() == name {
+            return e
+        }
+    }
+    return nil
+}
+
+func (m *Message) IsEnumExist(name string) bool {
+    return m.GetEnum(name) != nil
+}
+
+func (m *Message) HasField() bool {
+    return m != nil && len(m.Fields) > 0
+}
+
+func (m *Message) GetField(name string) *Field {
+    for _, f := range m.Fields {
+        if f.GetName() == name {
+            return f
+        }
+    }
+    return nil
+}
+
+func (m *Message) IsFieldExist(name string) bool {
+    return m.GetField(name) != nil
+}
+
+func (m *Message) HasOneof() bool {
+    return m != nil && len(m.Fields) > 0
+}
+
+func (m *Message) GetOneof(name string) *Oneof {
+    for _, o := range m.Oneofs {
+        if o.GetName() == name {
+            return o
+        }
+    }
+    return nil
+}
+
+func (m *Message) IsOneofExist(name string) bool {
+    return m.GetOneof(name) != nil
 }
 
 func (m *Message) GetName() string {
@@ -129,7 +176,7 @@ func (m *Message) GetLastOneof() *Oneof {
     return nil
 }
 
-func (m *Message) AppendInnerMessage(msg *Message) *Message {
+func (m *Message) AppendMessage(msg *Message) *Message {
     if m != nil && m.Proto != nil {
         msg.Parent = m
         m.Messages = append(m.Messages, msg)

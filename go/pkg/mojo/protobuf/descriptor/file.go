@@ -16,6 +16,8 @@ var (
 // It includes slices of all the Messages and Enums defined within it.
 // Those slices are constructed by WrapTypes.
 type File struct {
+    Packages *Packages
+
     Proto *descriptorpb.FileDescriptorProto
 
     Messages []*Message // All the Messages defined in this File.
@@ -67,6 +69,13 @@ func NewFileFrom(proto *descriptorpb.FileDescriptorProto) *File {
 func (f *File) proto() *descriptorpb.FileDescriptorProto {
     if f != nil {
         return f.Proto
+    }
+    return nil
+}
+
+func (f *File) GetPackages() *Packages {
+    if f != nil {
+        return f.Packages
     }
     return nil
 }
@@ -130,22 +139,6 @@ func (f *File) HasJavaOptions() bool {
     return false
 }
 
-func (f *File) HasService() bool {
-    return f != nil && len(f.Services) > 0
-}
-
-func (f *File) IsMessageExist(name string) bool {
-    if f != nil {
-        for _, msg := range f.Messages {
-            if name == msg.GetName() {
-                return true
-            }
-        }
-    }
-
-    return false
-}
-
 func (f *File) IsProto3() bool {
     return f != nil && (len(f.proto().GetSyntax()) == 0 || f.proto().GetSyntax() == Proto3Syntax)
 }
@@ -181,6 +174,63 @@ func (f *File) SetPackageName(name string) *File {
         f.Proto.Package = &name
     }
     return f
+}
+
+func (f *File) HasMessage() bool {
+    return f != nil && len(f.Messages) > 0
+}
+
+func (f *File) GetMessage(name string) *Message {
+    if f != nil {
+        for _, msg := range f.Messages {
+            if name == msg.GetName() {
+                return msg
+            }
+        }
+    }
+    return nil
+}
+
+func (f *File) IsMessageExist(name string) bool {
+    return f.GetMessage(name) != nil
+}
+
+func (f *File) HasEnum() bool {
+    return f != nil && len(f.Services) > 0
+}
+
+func (f *File) GetEnum(name string) *Enum {
+    if f != nil {
+        for _, e := range f.Enums {
+            if name == e.GetName() {
+                return e
+            }
+        }
+    }
+    return nil
+}
+
+func (f *File) IsEnumExist(name string) bool {
+    return f.GetEnum(name) != nil
+}
+
+func (f *File) HasService() bool {
+    return f != nil && len(f.Services) > 0
+}
+
+func (f *File) GetService(name string) *Service {
+    if f != nil {
+        for _, s := range f.Services {
+            if name == s.GetName() {
+                return s
+            }
+        }
+    }
+    return nil
+}
+
+func (f *File) IsServiceExist(name string) bool {
+    return f.GetService(name) != nil
 }
 
 func (f *File) AppendMessage(message *Message) *File {

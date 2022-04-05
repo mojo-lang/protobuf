@@ -21,6 +21,15 @@ func NewPackages() *Packages {
     }
 }
 
+func (p *Packages) GetMessage(name string) *Message {
+    if p != nil {
+        if msg, ok := p.MessagesByName[name]; ok {
+            return msg
+        }
+    }
+    return nil
+}
+
 func (p *Packages) AddFile(file *File) *Packages {
     if p != nil && file != nil {
         if _, ok := p.FilesByPath[file.GetName()]; !ok {

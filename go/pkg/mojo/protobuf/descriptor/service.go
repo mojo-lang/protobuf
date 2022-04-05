@@ -6,7 +6,10 @@
 
 package descriptor
 
-import "google.golang.org/protobuf/types/descriptorpb"
+import (
+    "google.golang.org/protobuf/types/descriptorpb"
+    "strings"
+)
 
 // Service describes an service.
 type Service struct {
@@ -44,6 +47,11 @@ func NewServiceFrom(file *File, proto *descriptorpb.ServiceDescriptorProto) *Ser
         Descriptor: Descriptor{File: file},
         Proto:      proto,
     }
+
+    for _, method := range proto.Method {
+        service.AppendMethod(NewMethodFrom(service, method))
+    }
+
     return service
 }
 
@@ -60,6 +68,9 @@ func (s *Service) GetName() string {
 
 func (s *Service) GetFullName() string {
     if s != nil {
+        if len(s.FullName) == 0 {
+            s.FullName = strings.Join([]string{s.GetPackageName(), s.GetName()}, ".")
+        }
         return s.FullName
     }
     return ""
@@ -78,6 +89,23 @@ func (s *Service) SetName(name string) *Service {
         s.FullName = concatFullName(s.File.GetPackageName(), name)
     }
     return s
+}
+
+func (s *Service) HasMethod() bool {
+    return s != nil && len(s.Methods) > 0
+}
+
+func (s *Service) GetMethod(name string) *Method {
+    for _, m := range s.Methods {
+        if m.GetName() == name {
+            return m
+        }
+    }
+    return nil
+}
+
+func (s *Service) IsMethodExist(name string) bool {
+    return s.GetMethod(name) != nil
 }
 
 func (s *Service) AppendMethod(method *Method) *Service {

@@ -22,6 +22,16 @@ func NewEnumValue(enum *Enum, name string, number int32) *EnumValue {
     }
 }
 
+func NewEnumValueFrom(enum *Enum, proto *descriptorpb.EnumValueDescriptorProto) *EnumValue {
+    return &EnumValue{
+        Descriptor: Descriptor{
+            File: enum.File,
+        },
+        Proto:  proto,
+        Parent: enum,
+    }
+}
+
 func (m *EnumValue) proto() *descriptorpb.EnumValueDescriptorProto {
     if m != nil {
         return m.Proto

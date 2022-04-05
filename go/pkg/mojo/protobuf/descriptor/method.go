@@ -25,6 +25,29 @@ func NewMethod(parent *Service) *Method {
     }
 }
 
+func NewMethodFrom(parent *Service, proto *descriptorpb.MethodDescriptorProto) *Method {
+    method := &Method{
+        Descriptor: Descriptor{
+            File: parent.File,
+        },
+        Proto:  proto,
+        Parent: parent,
+        Input:  nil,
+        Output: nil,
+    }
+
+    if packages := method.File.GetPackages(); packages != nil {
+        if proto.InputType != nil {
+            method.Input = packages.GetMessage(*proto.InputType)
+        }
+        if proto.OutputType != nil {
+            method.Output = packages.GetMessage(*proto.OutputType)
+        }
+    }
+
+    return method
+}
+
 func (m *Method) proto() *descriptorpb.MethodDescriptorProto {
     if m != nil {
         return m.Proto
@@ -45,6 +68,11 @@ func (m *Method) SetName(name string) *Method {
 
 func (m *Method) GetInput() *Message {
     if m != nil {
+        if m.Input == nil {
+            if packages := m.File.GetPackages(); packages != nil {
+                m.Input = packages.GetMessage(m.Proto.GetInputType())
+            }
+        }
         return m.Input
     }
     return nil
@@ -52,6 +80,11 @@ func (m *Method) GetInput() *Message {
 
 func (m *Method) GetOutput() *Message {
     if m != nil {
+        if m.Output == nil {
+            if packages := m.File.GetPackages(); packages != nil {
+                m.Output = packages.GetMessage(m.Proto.GetOutputType())
+            }
+        }
         return m.Output
     }
     return nil

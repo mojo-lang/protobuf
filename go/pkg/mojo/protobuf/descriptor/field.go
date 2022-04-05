@@ -6,6 +6,18 @@ import (
     "google.golang.org/protobuf/types/descriptorpb"
 )
 
+const (
+    FieldTypeBool   = "bool"
+    FieldTypeInt32  = "int32"
+    FieldTypeUInt32 = "uint32"
+    FieldTypeInt64  = "int64"
+    FieldTypeUInt64 = "uint64"
+    FieldTypeFloat  = "float"
+    FieldTypeDouble = "double"
+    FieldTypeString = "string"
+    FieldTypeBytes  = "bytes"
+)
+
 // A Field describes a message field.
 type Field struct {
     Descriptor
@@ -110,68 +122,83 @@ func (m *Field) GetTypeName() string {
     return m.proto().GetTypeName()
 }
 
-func (m *Field) HasOption() bool {
-    return m.proto().GetOptions() != nil
+// GetOptions get the predefined options in the field options
+func (m *Field) GetOptions() *descriptorpb.FieldOptions {
+    return m.proto().GetOptions()
+}
+
+func (m *Field) HasOptions() bool {
+    return m.GetOptions() != nil
+}
+
+func (m *Field) HasOption(extension protoreflect.ExtensionType) bool {
+    return proto.HasExtension(m.Proto.Options, extension)
 }
 
 func (m *Field) HasExtension(extension protoreflect.ExtensionType) bool {
-    return m.getOption(extension) != nil
+    return m.HasOption(extension)
 }
 
-func (m *Field) GetBoolOption(extension protoreflect.ExtensionType) *bool {
-    if v, ok := m.getOption(extension).(*bool); ok {
+func (m *Field) GetBoolOption(extension protoreflect.ExtensionType) bool {
+    if v, ok := m.GetOption(extension).(bool); ok {
         return v
     }
-    return nil
+    return false
 }
 
-func (m *Field) GetInt64Option(extension protoreflect.ExtensionType) *int64 {
-    if v, ok := m.getOption(extension).(*int64); ok {
+func (m *Field) GetInt64Option(extension protoreflect.ExtensionType) int64 {
+    if v, ok := m.GetOption(extension).(int64); ok {
         return v
     }
-    return nil
+    return 0
 }
 
-func (m *Field) GetFloat64Option(extension protoreflect.ExtensionType) *float64 {
-    if v, ok := m.getOption(extension).(*float64); ok {
+func (m *Field) GetFloat64Option(extension protoreflect.ExtensionType) float64 {
+    if v, ok := m.GetOption(extension).(float64); ok {
         return v
     }
-    return nil
+    return 0
 }
 
 func (m *Field) GetStringOption(extension protoreflect.ExtensionType) string {
-    if v, ok := m.getOption(extension).(*string); ok {
-        return *v
+    if v, ok := m.GetOption(extension).(string); ok {
+        return v
     }
     return ""
 }
 
-func (m *Field) SetBoolOption(extension protoreflect.ExtensionType, value bool) *Field {
-    if !m.HasExtension(extension) {
-        if m.Proto.Options == nil {
-            m.Proto.Options = &descriptorpb.FieldOptions{}
-        }
-        proto.SetExtension(m.Proto.Options, extension, value)
-    }
-    return m
-}
-
-func (m *Field) SetStringOption(extension protoreflect.ExtensionType, value string) *Field {
-    if !m.HasExtension(extension) {
-        if m.Proto.Options == nil {
-            m.Proto.Options = &descriptorpb.FieldOptions{}
-        }
-        proto.SetExtension(m.Proto.Options, extension, value)
-    }
-    return m
-}
-
-func (m *Field) getOption(extension protoreflect.ExtensionType) interface{} {
+func (m *Field) GetOption(extension protoreflect.ExtensionType) interface{} {
     if m.Proto.GetOptions() != nil {
         return proto.GetExtension(m.Proto.Options, extension)
     }
 
     return nil
+}
+
+func (m *Field) SetOption(extension protoreflect.ExtensionType, value interface{}) *Field {
+    if !m.HasExtension(extension) {
+        if m.Proto.Options == nil {
+            m.Proto.Options = &descriptorpb.FieldOptions{}
+        }
+    }
+    proto.SetExtension(m.Proto.Options, extension, value)
+    return m
+}
+
+func (m *Field) SetBoolOption(extension protoreflect.ExtensionType, value bool) *Field {
+    return m.SetOption(extension, value)
+}
+
+func (m *Field) SetStringOption(extension protoreflect.ExtensionType, value string) *Field {
+    return m.SetOption(extension, value)
+}
+
+func (m *Field) SetInt64Option(extension protoreflect.ExtensionType, value int64) *Field {
+    return m.SetOption(extension, value)
+}
+
+func (m *Field) SetFloat64Option(extension protoreflect.ExtensionType, value float64) *Field {
+    return m.SetOption(extension, value)
 }
 
 func (m *Field) IsRepeated() bool {
@@ -216,15 +243,15 @@ func (m *Field) SetTypeName(name string) *Field {
 }
 
 var fieldDescriptorProtoTypeName = map[descriptorpb.FieldDescriptorProto_Type]string{
-    descriptorpb.FieldDescriptorProto_TYPE_STRING: "string",
-    descriptorpb.FieldDescriptorProto_TYPE_BOOL:   "bool",
-    descriptorpb.FieldDescriptorProto_TYPE_INT32:  "int32",
-    descriptorpb.FieldDescriptorProto_TYPE_UINT32: "uint32",
-    descriptorpb.FieldDescriptorProto_TYPE_INT64:  "int64",
-    descriptorpb.FieldDescriptorProto_TYPE_UINT64: "uint64",
-    descriptorpb.FieldDescriptorProto_TYPE_FLOAT:  "float",
-    descriptorpb.FieldDescriptorProto_TYPE_DOUBLE: "double",
-    descriptorpb.FieldDescriptorProto_TYPE_BYTES:  "bytes",
+    descriptorpb.FieldDescriptorProto_TYPE_BOOL:   FieldTypeBool,
+    descriptorpb.FieldDescriptorProto_TYPE_INT32:  FieldTypeInt32,
+    descriptorpb.FieldDescriptorProto_TYPE_UINT32: FieldTypeUInt32,
+    descriptorpb.FieldDescriptorProto_TYPE_INT64:  FieldTypeInt64,
+    descriptorpb.FieldDescriptorProto_TYPE_UINT64: FieldTypeUInt64,
+    descriptorpb.FieldDescriptorProto_TYPE_FLOAT:  FieldTypeFloat,
+    descriptorpb.FieldDescriptorProto_TYPE_DOUBLE: FieldTypeDouble,
+    descriptorpb.FieldDescriptorProto_TYPE_STRING: FieldTypeString,
+    descriptorpb.FieldDescriptorProto_TYPE_BYTES:  FieldTypeBytes,
 }
 
 func protoType(t string) descriptorpb.FieldDescriptorProto_Type {
