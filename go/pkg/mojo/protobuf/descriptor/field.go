@@ -1,6 +1,7 @@
 package descriptor
 
 import (
+    "github.com/mojo-lang/core/go/pkg/mojo/core"
     "google.golang.org/protobuf/proto"
     "google.golang.org/protobuf/reflect/protoreflect"
     "google.golang.org/protobuf/types/descriptorpb"
@@ -256,23 +257,23 @@ var fieldDescriptorProtoTypeName = map[descriptorpb.FieldDescriptorProto_Type]st
 
 func protoType(t string) descriptorpb.FieldDescriptorProto_Type {
     switch t {
-    case "Double", "Float64":
+    case core.DoubleTypeName, core.Float64TypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_DOUBLE
-    case "Float", "Float32":
+    case core.FloatTypeName, core.Float32TypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_FLOAT
-    case "Int64", "Int":
+    case core.Int64TypeName, core.IntTypeName, core.NegativeTypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_INT64
-    case "UInt64", "UInt":
+    case core.UInt64TypeName, core.UIntTypeName, core.PositiveTypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_UINT64
-    case "Int8", "Int16", "Int32":
+    case core.Int8TypeName, core.Int16TypeName, core.Int32TypeName, core.ByteTypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_INT32
-    case "UInt8", "UInt16", "UInt32":
+    case core.UInt8TypeName, core.UInt16TypeName, core.UInt32TypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_UINT32
-    case "Bool":
+    case core.BoolTypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_BOOL
-    case "String":
+    case core.StringTypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_STRING
-    case "Bytes":
+    case core.BytesTypeName:
         return descriptorpb.FieldDescriptorProto_TYPE_BYTES
     case "Enum":
         return descriptorpb.FieldDescriptorProto_TYPE_ENUM
@@ -283,9 +284,11 @@ func protoType(t string) descriptorpb.FieldDescriptorProto_Type {
 
 func protoTypeName(typeName string) string {
     switch typeName {
-    case "Double", "Float64", "Float", "Float32",
-        "Int64", "Int", "UInt64", "UInt", "Int8", "Int16", "Int32", "UInt8", "UInt16", "UInt32",
-        "Bool", "String", "Bytes":
+    case core.DoubleTypeName, core.Float64TypeName, core.FloatTypeName, core.Float32TypeName,
+        core.Int64TypeName, core.IntTypeName, core.NegativeTypeName, core.UInt64TypeName, core.UIntTypeName, core.PositiveTypeName,
+        core.Int8TypeName, core.Int16TypeName, core.Int32TypeName, core.ByteTypeName,
+        core.UInt8TypeName, core.UInt16TypeName, core.UInt32TypeName,
+        core.BoolTypeName, core.StringTypeName, core.BytesTypeName:
         return fieldDescriptorProtoTypeName[protoType(typeName)]
     default:
         return typeName
