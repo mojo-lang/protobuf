@@ -9,7 +9,7 @@ package mojo.protobuf {
     }]
     
     dependencies: {
-        'mojo.core': {repository: 'github.com/mojo-lang/core', version: '0.0.0-20211123010202-03f9f6e22fd2'}
+        'mojo.core': {repository: 'github.com/mojo-lang/core', version: '^0.1'}
     }
     repository: 'https://github.com/mojo-lang/openapi'
 }
