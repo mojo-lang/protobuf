@@ -261,9 +261,9 @@ func protoType(t string) descriptorpb.FieldDescriptorProto_Type {
 		return descriptorpb.FieldDescriptorProto_TYPE_DOUBLE
 	case core.FloatTypeName, core.Float32TypeName, core.FloatTypeFullName, core.Float32TypeFullName:
 		return descriptorpb.FieldDescriptorProto_TYPE_FLOAT
-	case core.Int64TypeName, core.IntTypeName, core.NegativeTypeName, core.Int64TypeFullName, core.IntTypeFullName, core.NegativeTypeFullName:
+	case core.Int64TypeName, core.IntTypeName, core.Int64TypeFullName, core.IntTypeFullName:
 		return descriptorpb.FieldDescriptorProto_TYPE_INT64
-	case core.UInt64TypeName, core.UIntTypeName, core.PositiveTypeName, core.UInt64TypeFullName, core.UIntTypeFullName, core.PositiveTypeFullName:
+	case core.UInt64TypeName, core.UIntTypeName, core.PositiveTypeName, core.NegativeTypeName, core.UInt64TypeFullName, core.UIntTypeFullName, core.PositiveTypeFullName, core.NegativeTypeFullName:
 		return descriptorpb.FieldDescriptorProto_TYPE_UINT64
 	case core.Int8TypeName, core.Int16TypeName, core.Int32TypeName, core.ByteTypeName, core.Int8TypeFullName, core.Int16TypeFullName, core.Int32TypeFullName, core.ByteTypeFullName:
 		return descriptorpb.FieldDescriptorProto_TYPE_INT32
